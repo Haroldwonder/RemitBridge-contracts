@@ -10,9 +10,25 @@ jest.mock('../src/services/stellar', () => ({
   submitBatch: jest.fn(),
   estimateFee: jest.fn().mockReturnValue('0.0005000'),
 }));
+jest.mock('../src/events/EventPublisher', () => ({
+  eventPublisher: { publish: jest.fn().mockResolvedValue(1) },
+  EventPublisher: jest.fn(),
+}));
+jest.mock('../src/events/EventSchemas', () => ({
+  Schemas: {
+    payrollCreated: jest.fn().mockReturnValue({}),
+    payrollExecuted: jest.fn().mockReturnValue({}),
+    transferSettled: jest.fn().mockReturnValue({}),
+    transferFailed: jest.fn().mockReturnValue({}),
+    transferClawback: jest.fn().mockReturnValue({}),
+  },
+  EventTypes: {},
+  EVENT_VERSION: '1.0',
+}));
 
 process.env.JWT_SECRET = 'test-secret';
 process.env.DATABASE_URL = 'postgres://test';
+process.env.CORS_ORIGINS = 'http://localhost:5173';
 
 const app = require('../src/index');
 const { pool } = require('../src/db');
